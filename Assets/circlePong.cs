@@ -30,11 +30,15 @@ public class circlePong : MonoBehaviour
     private void Awake()
     {
         line = GetComponent<LineRenderer>();
+
         setupCircle();
+
+
         if(isShrinking)
             StartCoroutine(shrinkLine());
+		
 
-    }
+	}
 
     
 

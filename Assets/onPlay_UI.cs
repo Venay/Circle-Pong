@@ -1,22 +1,38 @@
 ﻿
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
+using System.Collections;
+using System;
 
 
 public class onPlay_UI : MonoBehaviour
 {
-    
-    public static TextMeshProUGUI scoreText;
-    public TextMeshProUGUI textElement;
-    
 
-    private void Awake()
+	public static TextMeshProUGUI scoreText;
+	public TextMeshProUGUI textElement;
+	public static TextMeshProUGUI hightScore;
+	public TextMeshProUGUI hightScoreClone;
+
+	
+
+
+
+
+
+	private void Awake()
     {
+		
+
         scoreText = textElement;
-        Time.timeScale = 0;
+		hightScore = hightScoreClone;
+
+
+
+		Time.timeScale = 0;
     }
 
-    
+  
 
     public void pressToStart()
     {
