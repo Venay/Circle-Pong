@@ -4,52 +4,49 @@ using UnityEngine;
 
 public class testScript : MonoBehaviour
 {
-    public Camera cam;
-    Vector3 V = Vector3.up;
-    float angle = 0;
-    void Update()
-    {
-        Vector3 mousePos = (cam.ScreenToWorldPoint(Input.mousePosition) + new Vector3(0, 0, 10));
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            angle = getAngle2D(V, mousePos.normalized);
-
-            
-            if ( Vector3.Dot(transform.right, mousePos.normalized) < 0)
-                angle *= -1;
-            Debug.Log(angle);
-                
-        }
-
-
-        if (Input.GetMouseButton(0))
-        {
-            V = mousePos.normalized;
-            V = Quaternion.AngleAxis(angle, Vector3.forward) * V;
-        }
-
-            transform.up = V;
-        if (Input.GetMouseButtonDown(1))
-        {
-            V = Vector3.up;
-        }
+	public Camera cam;
+	public Rigidbody2D rb;
+	public float force = 1;
+	public ForceMode2D forcemode;
 
 
 
-        
-    }
+	private void FixedUpdate()
+	{
+		
 
-    float getAngle2D(Vector2 V1, Vector2 V2)
-    {
-        return Mathf.Acos(Vector2.Dot(V1, V2) / (V1.magnitude * V2.magnitude)) * Mathf.Rad2Deg;
-    }
+		if (Input.GetMouseButtonDown(0))
+		{
+			StartCoroutine(slamForward(.5f, cam.ScreenToWorldPoint(Input.mousePosition)));
 
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(Vector3.zero, V);
-    }
+
+		}
+
+		
+
+	}
+
+
+
+	IEnumerator slamForward(float damping, Vector2 direction)
+	{
+		rb.AddForce(direction.normalized * force, forcemode);
+		print("force added");
+		while (rb.velocity.magnitude > 0)
+		{
+			Vector2 V = rb.velocity;
+			V.x = Mathf.Clamp(V.x * damping, 0, Mathf.Infinity);
+			V.y = Mathf.Clamp(V.y * damping, 0, Mathf.Infinity);
+			rb.velocity = V;
+			if (rb.velocity.magnitude <= .01f)
+				rb.velocity = Vector2.zero;
+
+			print("damping");
+			yield return null;
+		}
+
+
+	}
 
 }
