@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class testScript : MonoBehaviour
 {
+<<<<<<< HEAD
 	public Camera cam;
 	public Rigidbody2D rb;
 	public float force = 1;
@@ -18,11 +19,35 @@ public class testScript : MonoBehaviour
 		if (Input.GetMouseButtonDown(0))
 		{
 			StartCoroutine(slamForward(.5f, cam.ScreenToWorldPoint(Input.mousePosition)));
+=======
+	public Transform square, bin;
+	bool inBin = false;
+
+    // Update is called once per frame
+    void Update()
+    {
+
+		if (Input.GetMouseButtonDown(0))
+		{
+			if (inBin)
+			{
+				square.SetParent(transform);
+				inBin = !inBin;
+			}
+			else
+			{
+				square.SetParent(bin);
+				inBin = !inBin;
+			}
+		}
+
+>>>>>>> parent of 07d542e... Correct Controls
 
 
 
 		}
 
+<<<<<<< HEAD
 		
 
 	}
@@ -49,4 +74,7 @@ public class testScript : MonoBehaviour
 
 	}
 
+=======
+    }
+>>>>>>> parent of 07d542e... Correct Controls
 }
