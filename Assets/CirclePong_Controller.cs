@@ -4,105 +4,91 @@ using UnityEngine;
 
 public class CirclePong_Controller : MonoBehaviour
 {
-	public static int direc = 1;
+    public static int direc = 1;
 
 
-	public Camera cam;
-	public Transform ponger, bin;
-	public float dragSpeed = 20f;
-	
+    public Camera cam;
+    public float rotationSpeed = 1;
+    public int swipeFadeDamping = 10;
 
 
-	Touch tooch;
-	float rotationDrag = 0f;
-	Vector3 downPos, upPos, currentPos;
-	
+    Vector3 V = Vector3.up;
+    float angle, swipeFade = 0;
+    Vector3 touchPos = Vector3.zero;
+    Touch touch;
+    int direction = 1;
+
+
 
     // Update is called once per frame
     void Update()
     {
-		if (Input.touchCount > 0)
-		{
-
-			tooch = Input.GetTouch(0);
-
-			print("touching");
-
-		}
-
-		//Touch Starting ------------------------------------------------------------------
-		if (tooch.phase == TouchPhase.Began)
-		{
-			downPos = tooch.position;
-			//Debug.Log("Down : " + downPos.x);
-			currentPos = cam.ScreenToWorldPoint(tooch.position) + new Vector3(0, 0, 10);
-			
-			transform.up = (cam.ScreenToWorldPoint(tooch.position) + new Vector3(0, 0, 10) - transform.position).normalized;
-			//StartCoroutine(rotateTo(60, currentPos));
-			
-			ponger.SetParent(transform, true);
-		}
 
 
 
-		//Touching ---------------------------------------------------------------------
-		if (tooch.phase == TouchPhase.Moved)
-		{
-			//currentPos = cam.ScreenToWorldPoint(tooch.position) + new Vector3(0, 0, 10);
-			//StartCoroutine(rotateTo(2, currentPos));
-			if (ponger.parent != transform)
-				ponger.SetParent(transform, true);
+        if (Input.touchCount > 0)
+        {
 
-			transform.up = (cam.ScreenToWorldPoint(tooch.position) + new Vector3(0, 0, 10) - transform.position).normalized;
+            touch = Input.GetTouch(0);
+            touchPos = cam.ScreenToWorldPoint(touch.position) + new Vector3(0, 0, 10);
 
 
-
-		}
-
-
-		//Touch Ending ------------------------------------------------------------------
-		if (tooch.phase == TouchPhase.Ended)
-		{
-			
-			upPos = tooch.position;
-			
-			rotationDrag = (cam.ScreenToWorldPoint(upPos) - cam.ScreenToWorldPoint(downPos)).magnitude;
-
-			
-			if (upPos.x - downPos.x >= 0)
-				direc = 1;
-			else
-				direc = -1;
-			
-
-			
+            if (touch.phase == TouchPhase.Began)
+            {
+                angle = getAngle2D(V, touchPos.normalized);
 
 
-		}
+                if (Vector3.Dot(transform.right, touchPos.normalized) < 0)
+                    angle *= -1;
+            }
+
+            if (touch.phase == TouchPhase.Moved)
+            {
+                V = touchPos.normalized;
+                V = Quaternion.AngleAxis(angle, Vector3.forward) * V;
+            }
+
+            if (touch.phase == TouchPhase.Ended)
+            {
+                direction = Mathf.RoundToInt(Vector3.Dot(Vector3.right, touch.deltaPosition.normalized));
+                swipeFade = touch.deltaPosition.magnitude;
 
 
 
-		if(Input.touchCount == 0)
-		{
-			
-			ponger.Rotate(ponger.forward, direc * (Time.deltaTime * 20 + rotationDrag));
-		}
+            }
 
-		rotationDrag = Mathf.Clamp(rotationDrag - Time.deltaTime, 0, Mathf.Infinity);
+
+            transform.up = V;
+
+        }
+        else
+        {
+            transform.Rotate(Vector3.forward, direction * ((Time.deltaTime * rotationSpeed) + Mathf.Clamp(swipeFade / swipeFadeDamping, 0, 50)), Space.World);
+
+            Debug.Log(swipeFade);
+            swipeFade -= Time.deltaTime * 30;
+            V = transform.up;
+        }
+
+
+
+
+
+
 
 
     }
 
 
-	IEnumerator rotateTo(int frames, Vector3 too)
-	{
-		Vector3 oldup = transform.up;
-		for (int i = 1; i == frames; i++)
-		{
-			transform.up = Vector3.Lerp(oldup, (too - transform.position).normalized , i/frames);
-			yield return null;
-		}
-	}
+
+    float getAngle2D(Vector2 V1, Vector2 V2)
+    {
+        return Mathf.Acos(Vector2.Dot(V1, V2) / (V1.magnitude * V2.magnitude)) * Mathf.Rad2Deg;
+    }
+
+
+
 
 
 }
+
