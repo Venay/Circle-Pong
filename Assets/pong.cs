@@ -48,7 +48,7 @@ public class pong : MonoBehaviour
 			direction = Quaternion.AngleAxis(Random.Range(2, 15) * CirclePong_Controller.direc, Vector3.forward) * col.contacts[0].normal.normalized;
 
 
-		speed += .05f;
+		//speed += .05f;
 		rb.velocity = direction * speed;
 		
 

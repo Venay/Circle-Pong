@@ -40,11 +40,11 @@ public class circle : MonoBehaviour
     }
 
     List<point> points = new List<point>();
-    List<Vector2> circlePositions2D = new List<Vector2>();
+    public List<Vector2> circlePositions2D = new List<Vector2>();
     List<Vector3> circlePositions = new List<Vector3>();
-    
-    
 
+    public static int circlesCount = 0;
+    
 
 
     float deltaTheta()
@@ -79,6 +79,7 @@ public class circle : MonoBehaviour
                 circlePositions.Add(P.position);
                 circlePositions2D.Add( (Vector2)P.position );
             }
+
             
 
             points.Add(P);
@@ -102,8 +103,12 @@ public class circle : MonoBehaviour
         endSliceIndex = pointCount - Mathf.RoundToInt(endSlice * 360 * Mathf.Deg2Rad / deltaTheta());
 
         
-
         
+        
+
+
+
+
         if (startSliceIndex < endSliceIndex)
         {
             line.enabled = true;
@@ -123,6 +128,10 @@ public class circle : MonoBehaviour
 
 
             circleLoad();
+
+            
+
+
              if (endSlice != 0)
             {
                 circlePositions.Add(circlePositions[circlePositions.Count - 1]);
@@ -152,6 +161,9 @@ public class circle : MonoBehaviour
 
             col.edgeRadius = lineWidth / 2;
             col.points = circlePositions2D.ToArray();
+
+
+
         }
         else
         {
@@ -168,14 +180,17 @@ public class circle : MonoBehaviour
             
             
         }
-        
 
+        
 
     }
 
     private void Start()
     {
+        
+        
         drawCircle();
+        circlesCount++;
     }
 
 #if (UNITY_EDITOR)

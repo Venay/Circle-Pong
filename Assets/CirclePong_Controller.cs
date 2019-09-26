@@ -10,6 +10,7 @@ public class CirclePong_Controller : MonoBehaviour
     public Camera cam;
     public float rotationSpeed = 1;
     public int swipeFadeDamping = 10;
+    public float dragSpeed = .5f;
 
 
     Vector3 V = Vector3.up;
@@ -25,59 +26,73 @@ public class CirclePong_Controller : MonoBehaviour
     {
 
 
-
+        #region
         if (Input.touchCount > 0)
         {
 
             touch = Input.GetTouch(0);
             touchPos = cam.ScreenToWorldPoint(touch.position) + new Vector3(0, 0, 10);
 
+            if ( touch.position.y > Screen.height / 4) { 
+                if (touch.phase == TouchPhase.Began)
+                {
+                    angle = getAngle2D(V, touchPos.normalized);
 
-            if (touch.phase == TouchPhase.Began)
-            {
-                angle = getAngle2D(V, touchPos.normalized);
+
+                    if (Vector3.Dot(transform.right, touchPos.normalized) < 0)
+                        angle *= -1;
+                }
+
+                if (touch.phase == TouchPhase.Moved)
+                {
+                    V = touchPos.normalized;
+                    V = Quaternion.AngleAxis(angle , Vector3.forward) * V;
+                }
+
+                if (touch.phase == TouchPhase.Ended)
+                {
+                    direction = Mathf.RoundToInt(Vector3.Dot(Vector3.right, touch.deltaPosition.normalized));
+                    swipeFade = touch.deltaPosition.magnitude;
 
 
-                if (Vector3.Dot(transform.right, touchPos.normalized) < 0)
-                    angle *= -1;
+
+                }
+
+
+                transform.up = V;
+
             }
-
-            if (touch.phase == TouchPhase.Moved)
+            else
             {
-                V = touchPos.normalized;
-                V = Quaternion.AngleAxis(angle, Vector3.forward) * V;
-            }
 
-            if (touch.phase == TouchPhase.Ended)
-            {
-                direction = Mathf.RoundToInt(Vector3.Dot(Vector3.right, touch.deltaPosition.normalized));
-                swipeFade = touch.deltaPosition.magnitude;
+                if (touch.phase == TouchPhase.Moved)
+                    transform.Rotate(Vector3.forward, Vector2.Dot(touch.deltaPosition, Vector3.right) * dragSpeed , Space.World);
+
 
 
 
             }
-
-
-            transform.up = V;
 
         }
         else
         {
             transform.Rotate(Vector3.forward, direction * ((Time.deltaTime * rotationSpeed) + Mathf.Clamp(swipeFade / swipeFadeDamping, 0, 50)), Space.World);
 
-            Debug.Log(swipeFade);
+            //Debug.Log(swipeFade);
             swipeFade -= Time.deltaTime * 30;
             V = transform.up;
         }
 
+        #endregion // Controlls
 
 
-
-
+        
 
 
 
     }
+
+    
 
 
 

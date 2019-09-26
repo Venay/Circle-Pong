@@ -17,11 +17,35 @@
 			}
 		},
 		{
-			"file": "Assets/testFolder/circle.cs",
+			"contents": "",
+			"file": "/C/Users/Godolphin",
+			"file_size": -1,
+			"file_write_time": -1,
 			"settings":
 			{
-				"buffer_size": 2262,
-				"encoding": "UTF-8 with BOM",
+				"buffer_size": 0,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "",
+			"file": "/C/Users/Godolphin 1/Documents/Unity/3D test/1/Documents/Unity/3D",
+			"file_size": -1,
+			"file_write_time": -1,
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Shader \"TEST/TEST\"\n{\n\n}",
+			"file": "/C/Users/Godolphin 1/Documents/Unity/3D test/test/Assets/TEST/TEST.shader",
+			"file_size": -1,
+			"file_write_time": -1,
+			"settings":
+			{
+				"buffer_size": 23,
 				"line_ending": "Windows"
 			}
 		}
@@ -67,6 +91,7 @@
 	],
 	"file_history":
 	[
+		"/C/Users/Godolphin 1/Documents/Unity/Circle Pong/Circle-Pong/Assets/testFolder/circle.cs",
 		"/C/Tauri Launcher/MoP/Interface/AddOns/MyAddons/Core.lua",
 		"/C/Users/Godolphin 1/Documents/Unity/Circle Pong/Circle-Pong/Assets/spriteMaterial.mat",
 		"/C/Users/Godolphin 1/Documents/Unity/Circle Pong/Circle-Pong/Assets/testFolder/testScene.unity",
@@ -108,7 +133,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -136,34 +161,88 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "Assets/testFolder/circle.cs",
+					"file": "/C/Users/Godolphin",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2262,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2257,
-								2257
+								0,
+								0
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Unity3D/UnityC#.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1350.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/C/Users/Godolphin 1/Documents/Unity/3D test/1/Documents/Unity/3D",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/C/Users/Godolphin 1/Documents/Unity/3D test/test/Assets/TEST/TEST.shader",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 23,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								21,
+								21
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Unity3D Shader Highlighter and Snippets/UnityShader.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,

@@ -17,7 +17,7 @@ public class Killzone : MonoBehaviour
 
 	private void Awake()
 	{
-		randomColors();
+		//randomColors();
 	}
 
 	private void OnTriggerExit2D(Collider2D collision)
