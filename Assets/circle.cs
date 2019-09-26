@@ -5,212 +5,164 @@ using UnityEngine;
 
 
 
+
 [RequireComponent(typeof(LineRenderer))]
 [RequireComponent(typeof(EdgeCollider2D))]
 public class circle : MonoBehaviour
 {
-    [Header("Animation")]
-    public bool animate = false;
-    public float speed = 5f;
-    
+	[Header("components")]
+	[SerializeField] private LineRenderer line;
+	[SerializeField] private EdgeCollider2D col;
 
-    [Header("Components")]
-    public LineRenderer line;
-    public EdgeCollider2D col;
+	[Header("Circle Setup")]
+	[SerializeField] float radius = 2;
+	[SerializeField] int resolution = 24;
+	int pointCount () { return resolution + 1; }
+	float deltaTheta() {  return (2 * Mathf.PI) / resolution ; }
+	Vector2[] points;
 
-    [Header("Circle Settings")]
-    public float radius = 1f;
-    public int pointCount = 24;
-    public float offset = 0;
+	[Header("Circle Draw")]
+	[SerializeField] float lineWidth = .1f;
+	[SerializeField] int capResolution = 5;
 
-    [Header("Circle Draw")]
-    public bool loop;
-    public float lineWidth = .1f;
-    public int capPointCount = 5;
-    [Range(0, 1)] public float startSlice = 0;
-    [Range(0, 1)] public float endSlice = 360;
-    int startSliceIndex, endSliceIndex = 0;
+	[Header("Slice")]
+	[Range(0, 1)] public float startSlice;
+	[Range(1, 0)] public float endSlice;
+    int startSliceIndex () { return (startSlice >= endSlice) ? Mathf.RoundToInt(Mathf.Max(startSlice , endSlice) * 360 * Mathf.Deg2Rad / deltaTheta()) :  Mathf.RoundToInt(startSlice * 360 * Mathf.Deg2Rad / deltaTheta()); }
+    int endSliceIndex () { return (startSlice >= endSlice) ? Mathf.RoundToInt(Mathf.Max(startSlice, endSlice) * 360 * Mathf.Deg2Rad / deltaTheta()) : Mathf.RoundToInt(endSlice * 360 * Mathf.Deg2Rad / deltaTheta()); }
 
-    //Private Variables
-    public struct point
-    {
-        public Vector3 position;
-        public int index;
-        public float theta;
-    }
-
-    List<point> points = new List<point>();
-    public List<Vector2> circlePositions2D = new List<Vector2>();
-    List<Vector3> circlePositions = new List<Vector3>();
-
-    public static int circlesCount = 0;
-    
+	[Header("Game Manager")]
+	[SerializeField] int currentIndex = 0 ;
 
 
-    float deltaTheta()
-    {
-        return (2 * Mathf.PI) / pointCount;
-    }
+	void circleSetup()
+	{
+		
+		points = new Vector2[pointCount()];
+
+		float theta = 0;
+		float thetaDiff = startSlice * 360 * Mathf.Deg2Rad - deltaTheta() * startSliceIndex();
 
 
-    void circleLoad()
-    {
+		for (int i = 0; i < points.Length; i++)
+		{
+			if (i == pointCount() - 1 )
+			{
+				points[i] = new Vector2(radius, 0);
+				
+			} else if ( i == startSliceIndex() )
+			{
+				points[i] = new Vector2(radius * Mathf.Cos(theta + thetaDiff), radius * Mathf.Sin(theta + thetaDiff));
+				theta += deltaTheta();
+			}
+			else
+			{
+				points[i] = new Vector2(radius * Mathf.Cos(theta), radius * Mathf.Sin(theta));
+				theta += deltaTheta();
+			}
+		}
 
-        float thetaDiff = startSlice * 360 * Mathf.Deg2Rad - deltaTheta() * startSliceIndex;
-        float theta = 0;
-        for (int i = 0; i < pointCount; i++)
-        {
-            
-            point P;
-            P.index = i;
-            P.theta = theta;
-            if(i != startSliceIndex)
-                P.position = new Vector3(radius * Mathf.Cos(theta + offset * Mathf.Deg2Rad), 
-                                        radius * Mathf.Sin(theta + offset * Mathf.Deg2Rad),
-                                        0);
-            else
-                P.position = new Vector3(radius * Mathf.Cos(theta + thetaDiff +  offset * Mathf.Deg2Rad),
-                                        radius * Mathf.Sin(theta + thetaDiff +  offset * Mathf.Deg2Rad),
-                                        0);
+		
 
-
-            if ((i >= startSliceIndex) && (i <= endSliceIndex))
-            {
-                circlePositions.Add(P.position);
-                circlePositions2D.Add( (Vector2)P.position );
-            }
-
-            
-
-            points.Add(P);
-            theta += deltaTheta();
-        }
-
-        
-        
-
-    }
+	}
 
 
-    
 
-    void drawCircle()
-    {
+	void circleDraw()
+	{
 
-        
+		int sS = startSliceIndex();
+		int eS = endSliceIndex();
+		
+		int j = 0;
 
-        startSliceIndex = Mathf.RoundToInt(startSlice * 360 * Mathf.Deg2Rad / deltaTheta());
-        endSliceIndex = pointCount - Mathf.RoundToInt(endSlice * 360 * Mathf.Deg2Rad / deltaTheta());
+		circleSetup();
 
-        
-        
-        
+		Vector2[] colPos = new Vector2[(eS - sS) + 1];
+		Vector3[] linePos = new Vector3[(eS - sS) + 1];
+		
+
+		for (int i = sS; i <= eS ; i++)
+		{
+			linePos[j] = points[i];
+			colPos[j] = points[i];
+			j++;
+		}
+		//print(eS + " - " + sS + " = " + (eS-sS) + "  :  " + linePos.Length);
+
+
+		if ((startSlice == 0) && (endSlice == 1))
+			line.loop = true;
+		else
+			line.loop = false;
+
+		line.startWidth = line.endWidth = lineWidth;
+		line.numCapVertices = capResolution;
+
+		line.positionCount = linePos.Length;
+		line.SetPositions(linePos);
 
 
 
 
-        if (startSliceIndex < endSliceIndex)
-        {
-            line.enabled = true;
-            col.enabled = true;
+
+		col.edgeRadius = lineWidth / 2;
+		col.points = colPos;
+
+		GameManager.circlePoints[currentIndex] = new Vector2[colPos.Length];
+		GameManager.circlePoints[currentIndex] = colPos;
+		
+
+	}
 
 
-            points.Clear();
-            circlePositions.Clear();
-            circlePositions2D.Clear();
-
-            if ((startSliceIndex != 0) || (endSliceIndex != pointCount))
-                line.loop = false;
-            else
-                line.loop = loop;
-
-
-
-
-            circleLoad();
-
-            
-
-
-             if (endSlice != 0)
-            {
-                circlePositions.Add(circlePositions[circlePositions.Count - 1]);
-                circlePositions2D.Add(circlePositions2D[circlePositions2D.Count - 1]);
-            }
-            else 
-            {
-                circlePositions.Add( points[0].position );
-                circlePositions2D.Add( (Vector2) points[0].position );
-            }
-
-
-            /*
-            if (line.loop)
-                circlePositions.Add(circlePositions[0]);
-            */
+	private void Start()
+	{
+		circleDraw();
+		
+	}
 
 
 
-            line.startWidth = line.endWidth = lineWidth;
-            line.numCapVertices = capPointCount;
-            line.positionCount = circlePositions.Count;
-            line.SetPositions(circlePositions.ToArray());
+	private void OnValidate()
+	{
+		circleDraw();
+		
+	}
+
+	private void OnDrawGizmos()
+	{
+		Gizmos.color = Color.red;
+		int foo = 0;
+		
+		Vector2 oldPos = points[0];
+		
+		for (int i = 1; i < points.Length; i++)
+		{
+			Gizmos.DrawLine(oldPos, points[i]);
+			if ((i >= startSliceIndex() ) && ( i <= endSliceIndex()))
+			{
+				Gizmos.color = Color.blue;
+				Gizmos.DrawWireSphere(points[i], deltaTheta() / (1 / radius) / 3);
+				Gizmos.color = Color.red;
+				foo++;
+			}
+			else
+			{
+				Gizmos.color = Color.green;
+				Gizmos.DrawWireSphere(points[i], deltaTheta() / (1 / radius) / 9);
+				Gizmos.color = Color.red;
+			}
+			oldPos = points[i];
+		}
+
+		//print(foo + "  ---  " + (endSliceIndex()  - startSliceIndex() ));
+		
 
 
 
+	}
 
-            col.edgeRadius = lineWidth / 2;
-            col.points = circlePositions2D.ToArray();
-
-
-
-        }
-        else
-        {
-            if ((line.enabled) || (col.enabled))
-            {
-                col.enabled = false;
-                line.enabled = false;
-                return;
-            }
-            else
-            {
-                return;
-            }
-            
-            
-        }
-
-        
-
-    }
-
-    private void Start()
-    {
-        
-        
-        drawCircle();
-        circlesCount++;
-    }
-
-#if (UNITY_EDITOR)
-    private void OnValidate()
-    {
-        
-        drawCircle();
-    }
-#endif
-
-    private void Update()
-    {
-        if ((animate == true) && (Time.timeScale == 1) && (startSlice <= 1 - endSlice))
-        {
-            startSlice += Time.deltaTime / speed;
-            drawCircle();
-        }
-    }
-
-    
 
 
 }

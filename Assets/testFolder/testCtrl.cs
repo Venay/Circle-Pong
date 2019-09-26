@@ -8,10 +8,17 @@ public class testCtrl : MonoBehaviour
     public float speed = 50;
     public Rigidbody2D rb;
     Vector2 mousePosDelta, mousePosOld;
- 
+	[Space]
+	public Rigidbody2D rb2;
 
-    // Update is called once per frame
-    void Update()
+
+	private void Start()
+	{
+		rb2.AddForce(-Vector2.up * 50);
+	}
+
+	// Update is called once per frame
+	void Update()
     {
         /*
         mousePosDelta = (Vector2)cam.ScreenToWorldPoint(Input.mousePosition) - mousePosOld;
@@ -42,7 +49,6 @@ public class testCtrl : MonoBehaviour
                 rb.angularVelocity = 0;
 
             if (touch.phase == TouchPhase.Moved)
-                //rb.AddTorque(  Vector2.Dot(touch.deltaPosition, Vector2.right) );
                 rb.angularVelocity = (  Vector2.Dot(touch.deltaPosition, Vector2.right) * speed );
         }
 
