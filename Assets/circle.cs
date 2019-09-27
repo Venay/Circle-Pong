@@ -17,6 +17,7 @@ public class circle : MonoBehaviour
 	[Header("Circle Setup")]
 	[SerializeField] float radius = 2;
 	[SerializeField] int resolution = 24;
+    [SerializeField] float offset = 0;
 	int pointCount () { return resolution + 1; }
 	float deltaTheta() {  return (2 * Mathf.PI) / resolution ; }
 	Vector2[] points;
@@ -26,13 +27,14 @@ public class circle : MonoBehaviour
 	[SerializeField] int capResolution = 5;
 
 	[Header("Slice")]
-	[Range(0, 1)] public float startSlice;
-	[Range(1, 0)] public float endSlice;
+	[SerializeField][Range(0, 1)] float startSlice;
+    [SerializeField][Range(1, 0)] float endSlice;
     int startSliceIndex () { return (startSlice >= endSlice) ? Mathf.RoundToInt(Mathf.Max(startSlice , endSlice) * 360 * Mathf.Deg2Rad / deltaTheta()) :  Mathf.RoundToInt(startSlice * 360 * Mathf.Deg2Rad / deltaTheta()); }
     int endSliceIndex () { return (startSlice >= endSlice) ? Mathf.RoundToInt(Mathf.Max(startSlice, endSlice) * 360 * Mathf.Deg2Rad / deltaTheta()) : Mathf.RoundToInt(endSlice * 360 * Mathf.Deg2Rad / deltaTheta()); }
 
 	[Header("Game Manager")]
 	[SerializeField] int currentIndex = 0 ;
+    public Vector3 circleIdentifier() { return new Vector3(radius, startSlice * 360 * Mathf.Deg2Rad, endSlice * 360 * Mathf.Deg2Rad); }
 
 
 	void circleSetup()
@@ -48,16 +50,16 @@ public class circle : MonoBehaviour
 		{
 			if (i == pointCount() - 1 )
 			{
-				points[i] = new Vector2(radius, 0);
+				points[i] = new Vector2(radius * Mathf.Cos(offset * Mathf.Deg2Rad), radius * Mathf.Sin(offset * Mathf.Deg2Rad) );
 				
 			} else if ( i == startSliceIndex() )
 			{
-				points[i] = new Vector2(radius * Mathf.Cos(theta + thetaDiff), radius * Mathf.Sin(theta + thetaDiff));
+				points[i] = new Vector2(radius * Mathf.Cos(theta + thetaDiff + offset * Mathf.Deg2Rad), radius * Mathf.Sin(theta + thetaDiff + offset * Mathf.Deg2Rad));
 				theta += deltaTheta();
 			}
 			else
 			{
-				points[i] = new Vector2(radius * Mathf.Cos(theta), radius * Mathf.Sin(theta));
+				points[i] = new Vector2(radius * Mathf.Cos(theta + offset * Mathf.Deg2Rad), radius * Mathf.Sin(theta + offset * Mathf.Deg2Rad));
 				theta += deltaTheta();
 			}
 		}
@@ -109,28 +111,34 @@ public class circle : MonoBehaviour
 		col.edgeRadius = lineWidth / 2;
 		col.points = colPos;
 
-		GameManager.circlePoints[currentIndex] = new Vector2[colPos.Length];
-		GameManager.circlePoints[currentIndex] = colPos;
-		
 
-	}
+        
+
+
+
+    }
 
 
 	private void Start()
 	{
-		circleDraw();
+        line = GetComponent<LineRenderer>();
+        col = GetComponent<EdgeCollider2D>();
+        circleDraw();
 		
 	}
 
 
-
-	private void OnValidate()
+    
+    private void OnValidate()
 	{
+        
 		circleDraw();
 		
 	}
+    
 
-	private void OnDrawGizmos()
+
+    private void OnDrawGizmos()
 	{
 		Gizmos.color = Color.red;
 		int foo = 0;
