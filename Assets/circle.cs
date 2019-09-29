@@ -34,7 +34,9 @@ public class circle : MonoBehaviour
 
 	[Header("Game Manager")]
 	[SerializeField] int currentIndex = 0 ;
-    public Vector3 circleIdentifier() { return new Vector3(radius, startSlice * 360 * Mathf.Deg2Rad, endSlice * 360 * Mathf.Deg2Rad); }
+	public Vector2[] colPos;
+
+
 
 
 	void circleSetup()
@@ -80,7 +82,7 @@ public class circle : MonoBehaviour
 
 		circleSetup();
 
-		Vector2[] colPos = new Vector2[(eS - sS) + 1];
+		colPos = new Vector2[(eS - sS) + 1];
 		Vector3[] linePos = new Vector3[(eS - sS) + 1];
 		
 
@@ -111,8 +113,7 @@ public class circle : MonoBehaviour
 		col.edgeRadius = lineWidth / 2;
 		col.points = colPos;
 
-
-        
+		
 
 
 

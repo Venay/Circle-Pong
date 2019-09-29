@@ -8,52 +8,129 @@ public class GameManager : MonoBehaviour
 	[Header("statics")]
 	public static int score;
 	public static int hightScore;
-    [SerializeField] Rigidbody2D playerRB;
+	public static int scoreMultiplyer;
+	public static bool isInsideCrit;
+	public static GameObject critOBJ;
+	[SerializeField] Rigidbody2D playerRB;
 	[SerializeField] int circlesCount = 1;
-    [SerializeField] circle[] circles;
+	[SerializeField] circle[] circles;
 
-   
+	[Header("Ciritcal Object")]
+	[SerializeField] Camera cam;
+	[SerializeField] GameObject criticalObjectPrefab;
+	[SerializeField] float spawnDelay = 1f;
+	public static int criticalObjectCount = 0;
+	GameObject criticalObject;
 
+	[Space]
+	[SerializeField] Color critHitColor ;
+	Color oldCamColor ;
+	[SerializeField] int frames;
 
+	private void Start()
+	{	
+		GameEventSystem.current.onBallHit += ballHit;
+		oldCamColor = cam.backgroundColor;
+		spawnCritical();
 
-
+	}
 
 
 
 	
 
-	private void Update()
+
+
+
+
+	void ballHit()
 	{
-		if (Input.GetMouseButtonDown(0))
+		if (isInsideCrit)
 		{
-            
-            Debug.DrawLine(Vector2.zero, randomCirclePos(), Color.cyan, 2);
+			//score
+			scoreMultiplyer++;
+			score += 2 * scoreMultiplyer;
+
+			//effects
+			StartCoroutine(lerpValue(critHitColor, frames));
+			cam.backgroundColor = Color.Lerp(oldCamColor, critHitColor, Mathf.Clamp01(scoreMultiplyer / 10.0f));
+
+
+			//Ball
+			Ball.speed += .1f ;
+
+			//Crit Object
+			Destroy(critOBJ);
+			criticalObjectCount--;
+			isInsideCrit = false;
+			spawnCritical();
 
 		}
+		else
+		{
+			score++;
+			scoreMultiplyer = 1;
+			Ball.speed = 2;
+		}
+		
+
+		
+	}
+
+	IEnumerator lerpValue(Color toC, int frames)
+	{
+		Color defaultC = cam.backgroundColor;
+		for (int i = 0; i <= frames; i++)
+		{
+
+			cam.backgroundColor = Color.Lerp(toC, defaultC, (float)i / frames );
+			yield return null;
+
+		}
+
+
+	}
+
+	public void spawnCritical()
+	{
+		StartCoroutine(spawnCritical(spawnDelay));
+	}
+
+	
+
+	
+
+
+
+	private void OnTriggerExit2D(Collider2D col)
+	{
+		if (col.tag == "Player")
+		{
+			StartCoroutine(lerpValue(Color.red, 15));
+			score = 0;
+			scoreMultiplyer = 1;
+			playerRB.position = Vector2.zero;
+
+		}
+
 	}
 
 
 
-    Vector2 randomCirclePos()
-    {
-        Vector3 V = circles[Random.Range(0, circles.Length)].circleIdentifier();
-        float theta = Random.Range(V.y, V.z);
-        return new Vector2(V.x * Mathf.Cos(theta), V.x * Mathf.Sin(theta));
-    }
+
+
+	IEnumerator spawnCritical( float delay)
+	{
+		criticalObjectCount++;
+		yield return new WaitForSeconds(delay);
+		int i = Random.Range(0, circles.Length);
+		Vector2 pos = circles[i].colPos[Random.Range(0, circles[i].colPos.Length)];
+		pos = circles[i].transform.rotation * pos;
+		critOBJ = Instantiate(criticalObjectPrefab, pos, Quaternion.identity, circles[i].transform);
+	}
 
 
 
-    private void OnTriggerExit2D(Collider2D col)
-    {
-        if (col.tag == "Player")
-        {
-            playerRB.position = Vector2.zero;
-            
-        }
-            
-    }
-
-
-
+	
 
 }
