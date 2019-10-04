@@ -4,53 +4,37 @@ using UnityEngine;
 
 public class testCtrl : MonoBehaviour
 {
-    public Camera cam;
-    public float speed = 50;
-    public Rigidbody2D rb;
-    Vector2 mousePosDelta, mousePosOld;
-	[Space]
-	public Rigidbody2D rb2;
+	public Camera cam;
+	public float speed = 1;
+	Vector2 mousePosOld, mousePosDelta = Vector2.zero;
+	float rotX = 0;
+	
+
+	
 
 
-	private void Start()
+	void Update()
 	{
-		rb2.AddForce(-Vector2.up * 50);
+
+		mousePosDelta = mousePosOld - (Vector2)cam.ScreenToWorldPoint(Input.mousePosition);
+
+		if (Input.GetMouseButton(0))
+		{
+			rotX = Vector2.Dot(Vector2.right.normalized, mousePosDelta.normalized);
+			rotX = rotX * (mousePosDelta.magnitude / Time.deltaTime) * -speed;
+		}
+
+			print(rotX);
+		transform.RotateAround(Vector3.zero, Vector3.forward, rotX);
+		if (rotX >= 0)
+			rotX = Mathf.Clamp(rotX - Time.deltaTime, 0, Mathf.Infinity);
+		else
+			rotX = Mathf.Clamp(rotX + Time.deltaTime, Mathf.NegativeInfinity, 0);
+		
+
+
+		mousePosOld = cam.ScreenToWorldPoint( Input.mousePosition );
+
 	}
 
-	// Update is called once per frame
-	void Update()
-    {
-        /*
-        mousePosDelta = (Vector2)cam.ScreenToWorldPoint(Input.mousePosition) - mousePosOld;
-        if (Input.GetMouseButton(0))
-        {
-            rb.AddTorque(Vector2.Dot(mousePosDelta, Vector2.right) * speed);
-            //rb.angularVelocity = Vector2.Dot(mousePosDelta, Vector2.right) * speed;
-            //print(Vector2.Dot(mousePosDelta, Vector2.right));
-        }
-
-        if (Input.GetTouch(0).phase == TouchPhase.Moved)
-        {
-            rb.AddTorque(Vector2.Dot(  (Vector2)cam.ScreenToWorldPoint(Input.GetTouch(0).deltaPosition)       , Vector2.right) * speed);
-        }
-
-        print(Vector2.Dot(mousePosDelta, Vector2.right)*speed);
-
-
-        mousePosOld = (Vector2)cam.ScreenToWorldPoint(Input.mousePosition);
-        */
-
-
-
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
-                rb.angularVelocity = 0;
-
-            if (touch.phase == TouchPhase.Moved)
-                rb.angularVelocity = (  Vector2.Dot(touch.deltaPosition, Vector2.right) * speed );
-        }
-
-    }
 }
