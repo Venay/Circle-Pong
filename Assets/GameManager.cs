@@ -27,11 +27,17 @@ public class GameManager : MonoBehaviour
 	Color oldCamColor ;
 	[SerializeField] int frames;
 
+	public enum contolStyle { radial, horizontal , vertical }
+	[Header("Control")]
+	[SerializeField]public static contolStyle control = contolStyle.radial;
+	public contolStyle controlType = contolStyle.radial;
+
 	private void Start()
 	{	
 		GameEventSystem.current.onBallHit += ballHit;
 		oldCamColor = cam.backgroundColor;
 		spawnCritical();
+		control = controlType;
 
 	}
 
