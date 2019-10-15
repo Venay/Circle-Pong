@@ -137,6 +137,9 @@ public class GameManager : MonoBehaviour
 
 
 
-	
+	public static float getAngle2D(Vector2 V1, Vector2 V2)
+	{
+		return Mathf.Acos(Vector2.Dot(V1, V2) / (V1.magnitude * V2.magnitude)) * Mathf.Rad2Deg;
+	}
 
 }
