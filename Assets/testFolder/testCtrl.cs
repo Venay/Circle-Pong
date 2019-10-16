@@ -2,39 +2,59 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class testCtrl : MonoBehaviour
 {
 	public Camera cam;
-	public float speed = 1;
-	Vector2 oldMousePos, deltaMousePos = Vector2.zero;
-	float swipeDrag = 0;
-	
-
-	
-
+	public float smoothAngle, dragPower = .3f;
+	public bool isRadial = true;
+	float angle, angleOld, angleDelta, angleRef;
+	Vector2 mousePosOld, mousePosDelta = Vector2.zero;
 
 	void Update()
 	{
 
-		deltaMousePos = oldMousePos - (Vector2)cam.ScreenToWorldPoint(Input.mousePosition);
 
+
+		Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+		mousePosDelta = mousePos - mousePosOld;
 		if (Input.GetMouseButton(0))
 		{
-			swipeDrag = Vector2.Dot(Vector2.right.normalized, deltaMousePos.normalized);
-			swipeDrag = swipeDrag * (deltaMousePos.magnitude / Time.deltaTime) * -speed;
+
+
+
+			
+			float rotX = (mousePosDelta.magnitude / Time.deltaTime) * dragPower * -Mathf.Sign(mousePos.y) * Mathf.Sign(Vector2.Dot(Vector2.right, mousePosDelta));
+
+			transform.Rotate(Vector3.forward, rotX);
+
+
+			
+			angleDelta = Mathf.DeltaAngle(angleOld, transform.localEulerAngles.z);
+			angleOld = transform.localEulerAngles.z;
+
+
+		}
+		else
+		{
+			//mousePosOld = Vector2.zero;
+			transform.RotateAround(transform.position, transform.forward, angleDelta);
+			angleDelta = Mathf.SmoothDampAngle(angleDelta, 0, ref angleRef, smoothAngle);
 		}
 
-		
-		transform.RotateAround(Vector3.zero, Vector3.forward, swipeDrag);
-		if (swipeDrag >= 0)
-			swipeDrag = Mathf.Clamp(swipeDrag - Time.deltaTime, 0, Mathf.Infinity);
-		else
-			swipeDrag = Mathf.Clamp(swipeDrag + Time.deltaTime, Mathf.NegativeInfinity, 0);
-		
-
-
-		oldMousePos = cam.ScreenToWorldPoint( Input.mousePosition );
+		mousePosOld = mousePos;
 
 	}
 
+	Vector2 rotated2D(Vector2 V, float a)
+	{
+		return new Vector2(V.x * Mathf.Cos(a) - V.y * Mathf.Sin(a), V.x * Mathf.Sin(a) + V.y * Mathf.Cos(a));
+	}
+
 }
+
+
+
+
+
+

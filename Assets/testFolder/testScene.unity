@@ -151,7 +151,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 2054679128}
-  speed: 0.5
+  smoothAngle: 0.3
+  dragPower: 1
+  isRadial: 0
 --- !u!212 &196142029
 SpriteRenderer:
   m_ObjectHideFlags: 0
