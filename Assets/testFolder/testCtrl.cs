@@ -2,53 +2,53 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class testCtrl : MonoBehaviour
 {
 	public Camera cam;
-	public Rigidbody2D rb;
-	float angle, oldAngle, deltaAngle;
-
-	public enum controlTypes {radial, horizontal, vertical }
-	public controlTypes control;
-	
+	public float smoothAngle, dragPower = .3f;
+	public bool isRadial = true;
+	float angle, angleOld, angleDelta, angleRef;
+	Vector2 mousePosOld, mousePosDelta = Vector2.zero;
 
 	void Update()
 	{
-		Debug.DrawLine(rb.transform.position, rb.transform.right);
-		Debug.DrawLine(rb.transform.position, rb.transform.up, Color.blue);
+
 
 
 		Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-		Vector2 V = rb.transform.up;
-
-		
-		
-
-		if (Input.GetMouseButtonDown(0))
-		{
-			rb.angularVelocity = 0;
-			angle = GameManager.getAngle2D(V, mousePos.normalized)*Mathf.Sign(Vector2.Dot(rb.transform.right, mousePos.normalized));
-
-		}
-
+		mousePosDelta = mousePos - mousePosOld;
 		if (Input.GetMouseButton(0))
 		{
-			V = Quaternion.AngleAxis(angle, Vector3.forward) * mousePos.normalized;
-			rb.transform.up = V;
-			deltaAngle = Mathf.DeltaAngle(transform.localEulerAngles.z, oldAngle);
-			oldAngle = transform.localEulerAngles.z;
-		}
 
-		if (Input.GetMouseButtonUp(0))
+
+
+			
+			float rotX = (mousePosDelta.magnitude / Time.deltaTime) * dragPower * -Mathf.Sign(mousePos.y) * Mathf.Sign(Vector2.Dot(Vector2.right, mousePosDelta));
+
+			transform.Rotate(Vector3.forward, rotX);
+
+
+			
+			angleDelta = Mathf.DeltaAngle(angleOld, transform.localEulerAngles.z);
+			angleOld = transform.localEulerAngles.z;
+
+
+		}
+		else
 		{
-			print(deltaAngle/Time.deltaTime);
-			rb.angularVelocity = -deltaAngle / Time.deltaTime;
+			//mousePosOld = Vector2.zero;
+			transform.RotateAround(transform.position, transform.forward, angleDelta);
+			angleDelta = Mathf.SmoothDampAngle(angleDelta, 0, ref angleRef, smoothAngle);
 		}
 
-		
-		
+		mousePosOld = mousePos;
 
 	}
 
+	Vector2 rotated2D(Vector2 V, float a)
+	{
+		return new Vector2(V.x * Mathf.Cos(a) - V.y * Mathf.Sin(a), V.x * Mathf.Sin(a) + V.y * Mathf.Cos(a));
+	}
 
 }

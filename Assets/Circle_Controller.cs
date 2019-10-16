@@ -6,58 +6,60 @@ public class Circle_Controller : MonoBehaviour
 {
 	[SerializeField] Camera cam;
 	[SerializeField] Transform[] circles;
-	[SerializeField] float dragSpeed = 1f;
-	[SerializeField] float dragFade = 2;
+	[SerializeField] float smoothAngle = .3f;
 	//public float t2 = 2;
 
-	float angle;
-	float swipeDrag = 0;
-
-	float oldZ, oldDrag = 0;
-	int countZ = 0;
-	Vector2 oldMousePos, deltaMousePos = Vector2.zero;
+	float angle,angleOld,angleDelta,angleRef;
+	
 
 
 
 
 	private void Update()
 	{
-
-		if (Input.touchCount > 0)
+		//----------------------------------------
+		// TOUCH CONTROLS
+		//----------------------------------------
+		if (Input.touchCount > 0)  
 		{
 			Touch touch = Input.GetTouch(0);
 			Vector2 touchPos = (Vector2)cam.ScreenToWorldPoint(touch.position);
 
-			Vector2 V = transform.up;
 
 			if (touch.phase == TouchPhase.Began)
 			{
-				angle = getAngle2D(V, touchPos.normalized);
-
-				if (Vector2.Dot(transform.right, touchPos.normalized) < 0)
-					angle *= -1;
+				angle = getAngle2D(transform.up, touchPos.normalized) * Mathf.Sign(Vector2.Dot(transform.right, touchPos.normalized));
 			}
-
-			if ((touch.phase == TouchPhase.Moved) || (touch.phase == TouchPhase.Stationary))
+			else if ((touch.phase == TouchPhase.Moved) || (touch.phase == TouchPhase.Stationary))
 			{
-				V = Quaternion.AngleAxis(angle, Vector3.forward) * touchPos.normalized;
-				countZ++;
+				Vector2 V = Quaternion.AngleAxis(angle, transform.forward) * touchPos.normalized;
+				transform.up = V;
+				angleDelta = Mathf.DeltaAngle(angleOld, transform.localEulerAngles.z);
+				angleOld = transform.localEulerAngles.z;
 			}
-
-			if ((touch.phase == TouchPhase.Ended) || (touch.phase == TouchPhase.Canceled))
-			{
-				swipeDrag = -Mathf.DeltaAngle(transform.rotation.eulerAngles.z, oldZ)*countZ;
-				countZ = 0;
-			}
-			
-			oldZ = transform.rotation.eulerAngles.z;
-			transform.up = V;
 		}
+		//----------------------------------------
+		// MOUSE CONTROLS
+		//----------------------------------------
+		else if (Input.GetMouseButton(0))
+		{
+			Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+			if (Input.GetMouseButtonDown(0))
+			{
+				angle = GameManager.getAngle2D(transform.up, mousePos.normalized) * Mathf.Sign(Vector2.Dot(transform.right, mousePos.normalized));
+			}
+			Vector2 V = Quaternion.AngleAxis(angle, transform.forward) * mousePos.normalized;
+			transform.up = V;
+			angleDelta = Mathf.DeltaAngle(angleOld, transform.localEulerAngles.z);
+			angleOld = transform.localEulerAngles.z;
+		}
+		//----------------------------------------
+		// DRAG SETTINGS
+		//----------------------------------------
 		else
 		{
-			oldDrag = swipeDrag/dragFade;
-			transform.RotateAround(transform.position, Vector3.forward, swipeDrag*Time.deltaTime * dragSpeed);
-			swipeDrag = Mathf.Max(swipeDrag - oldDrag, 0);
+			transform.RotateAround(transform.position, transform.forward, angleDelta);
+			angleDelta = Mathf.SmoothDampAngle(angleDelta, 0, ref angleRef, smoothAngle);
 		}
 
 
